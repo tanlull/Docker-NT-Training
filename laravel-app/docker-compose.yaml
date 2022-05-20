@@ -1,0 +1,59 @@
+version: '3'
+services:
+  tan-laravel-service:
+    build:
+      context: .
+      dockerfile: ./docker-php/Dockerfile
+    image: tanlull/laravel-app:1.0.0
+    container_name: tan-laravel2
+    ports:
+      - "20080:80"
+    restart: unless-stopped
+    tty: true
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    networks:
+      - tan-network2
+    
+# Database คือ mysql container ครับ เพื่อที่จะทำเป็น database
+  tan-mysql-service:
+    # ส่วนนี้เราจะดึง image มาตรง ๆ เลยครับโดยที่เราไม่สร้าง Dockerfile
+    # เพราะเราไม่ต้องการจะ เซตคำสั่งอะไรเพิ่มเติมแล้ว
+    image: mysql:8.0
+    container_name: tan-mysql2
+    volumes:
+      - ./root/tan/mysql-data2:/var/lib/mysql # volume database เข้ามาในเครื่องเราที่จะเก็บข้อมูลใน database ไว้
+    restart: unless-stopped
+    #tty: true
+    environment:
+      # สำหรับคนที่ต้องการดู config เพิ่มเติม https://hub.docker.com/_/mysql/
+      - MYSQL_DATABASE=${DB_DATABASE} # ชื่อ database ซึ่งที่จะสร้างขึ้นหลังจาก container ถูกสร้างแล้ว
+      - MYSQL_USER=${DB_USERNAME} # username ของ database ที่เราสร้างไว้
+      - MYSQL_PASSWORD=${DB_PASSWORD} # password ของ database ที่เราสร้างไว้
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD} # password สำหรับ root database หากต้องการ
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    ports:
+      - "23306:3306" # port ที่เราต้องการจะใช้ระหว่าง {host}:{container} นะครับ
+    networks:
+      - tan-network2
+
+# Phpmyadmin (optional) อันนี้เพิ่มเติม หากว่าเราต้องการที่จะ explore database
+  tan-phpmyadmin-service:
+    image: phpmyadmin:latest
+    container_name: tan-phpmyadmin2
+    ports:
+      - 20088:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=tan-mysql-service
+    restart: always
+    depends_on:
+      - tan-mysql-service
+    networks:
+      - tan-network2
+
+
+networks:
+  tan-network2:
+    driver: bridge
