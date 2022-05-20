@@ -29,9 +29,9 @@ services:
     environment:
       # สำหรับคนที่ต้องการดู config เพิ่มเติม https://hub.docker.com/_/mysql/
       - MYSQL_DATABASE=${DB_DATABASE} # ชื่อ database ซึ่งที่จะสร้างขึ้นหลังจาก container ถูกสร้างแล้ว
-      - MYSQL_USER=${DB_USERNAME} # username ของ database ที่เราสร้างไว้
-      - MYSQL_PASSWORD=${DB_PASSWORD} # password ของ database ที่เราสร้างไว้
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD} # password สำหรับ root database หากต้องการ
+      - MYSQL_USER=${DB_USERNAME} # นำมาจาก .env ใน laravel-app
+      - MYSQL_PASSWORD=${DB_PASSWORD} # นำมาจาก .env ใน laravel-app
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD} # นำมาจาก .env ใน laravel-app
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     ports:
       - "23306:3306" # port ที่เราต้องการจะใช้ระหว่าง {host}:{container} นะครับ
